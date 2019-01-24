@@ -1,0 +1,9 @@
+name: MerluchAssur
+version: 1.0beta
+author: labbeh
+main: fr.labbeh.merluchassur.MerluchAssur
+commands:
+  merluch:
+    description: commands for users
+  merluchadmin:
+    description: commands for admins
