@@ -44,8 +44,7 @@ public class MerluchAssur extends JavaPlugin
 	/**
 	 * Construit une instance du plugin
 	 * */
-	public MerluchAssur()
-	{
+	public MerluchAssur() {
 		super();
 		this.assures = new HashMap<>();
 		this.fu = new FileUtilities(this);
@@ -58,8 +57,7 @@ public class MerluchAssur extends JavaPlugin
 	 * Mode test pour rentrer des assurés en dure
 	 * Ajoute 2 assurés du nom de labbeh et tsaero
 	 * */
-	public void enDure()
-	{
+	public void enDure() {
 		this.assures.put("labbeh", new Assure("labbeh"));
 		this.assures.put("tsaero", new Assure("tsaero"));
 	}
@@ -68,8 +66,7 @@ public class MerluchAssur extends JavaPlugin
 	 * Ajoute un nouvel assur� et cr��er son fichier de configuration
 	 * @param playerName nom du joueur � assurer en String
 	 * */
-	public void add(String playerName)
-	{
+	public void add(String playerName) {
 		this.assures.put(playerName, new Assure(playerName));
 		this.saveAll();
 	}
@@ -80,8 +77,7 @@ public class MerluchAssur extends JavaPlugin
 	 * Affiche un message pour dire que le plugin est actif
 	 * */
 	@Override
-	public void onEnable()
-	{
+	public void onEnable() {
 		super.onEnable();
 		
 		this.getCommand("merluch"	  ).setExecutor(new CommandMerluch(this)	 );
@@ -103,8 +99,7 @@ public class MerluchAssur extends JavaPlugin
 	 * Affiche un message dans la console à la fermeture
 	 * */
 	@Override
-	public void onDisable()
-	{
+	public void onDisable() {
 		super.onDisable();
 		System.out.println("MerluchAssur beta1.0 by labbeh: disabled");
 	}
@@ -113,8 +108,7 @@ public class MerluchAssur extends JavaPlugin
 	 * Crééer le dossier de sauvegarde des fichiers de données des assurés si il n'exsite pas
 	 * @return vrai si le dossier n'exsite pas et qu'il vient d'être crééer
 	 * */
-	public boolean prepareSerialization() 
-	{
+	public boolean prepareSerialization() {
 		File dataDirectory = new File(MerluchAssur.DATAS_PATH);
 		return dataDirectory.mkdir();
 	}
@@ -123,16 +117,14 @@ public class MerluchAssur extends JavaPlugin
 	 * Sauvgarde les infos de l'assuré dont le nom est passé en paramètre
 	 * @param playerName nom de l'assuré en String
 	 * */
-	public void save(String playerName)
-	{
+	public void save(String playerName) {
 		this.fu.saveAssureStat(playerName);
 	}
 	
 	/**
 	 * Sauvegarde les infos de tous les assurés
 	 * */
-	public void saveAll()
-	{
+	public void saveAll() {
 		Collection<Assure> assures = this.assures.values();
 		
 		for(Assure assure: assures)
@@ -143,8 +135,7 @@ public class MerluchAssur extends JavaPlugin
 	 * Vide le coffre d'assurance de l'assuré dont le nom est passé en paramètre
 	 * @param playerName nom de l'assuré
 	 * */
-	public boolean clearChests(String playerName)
-	{
+	public boolean clearChests(String playerName) {
 		Assure assure = this.getAssure(playerName);
 		if(assure == null) return false;
 		
@@ -154,9 +145,19 @@ public class MerluchAssur extends JavaPlugin
 		
 	}
 	
+	/*---------------*/
 	/* MODIFICATEURS */
-	public void setAssure(String worldName, String playerName, int nbMorts, double posX, double posY, double posZ)
-	{
+	/*---------------*/
+	/**
+	 * Ajoute un Assure existant dans un fichier
+	 * @param worldName nom du monde
+	 * @param playerName nom du joueur
+	 * @param nbMorts nombre de fois ou est mort le joueur
+	 * @param posX position X du joueur
+	 * @param posY position Y du joueur
+	 * @param posZ position Z du joueur
+	 * */
+	public void setAssure(String worldName, String playerName, int nbMorts, double posX, double posY, double posZ) {
 		World 	 worldOfChest = this.getServer().getWorld(worldName);
 		Location locChest  	  = new Location(worldOfChest, posX, posY, posZ);
 		Chest 	 chest 		  = (Chest)locChest.getBlock().getState();
@@ -168,19 +169,19 @@ public class MerluchAssur extends JavaPlugin
 	 * Incrémente le nombre de mort de l'assuré dont le nom est passé en paramètre
 	 * @param name nom de l'Assure
 	 * */
-	public void incMort(String name) 
-	{
+	public void incMort(String name) {
 		this.getAssure(name).incMort();
 	}
 	
+	/*------------*/
 	/* ACCESSEURS */
+	/*------------*/
 	/**
 	 * Retourne un Assure associé au nom passé en paramètre, null si il n'existe pas
 	 * @param playerName nom de l'assuré en String
 	 * @return Assure associé au nom en paramètre ou null
 	 * */
-	public Assure getAssure(String playerName)
-	{
+	public Assure getAssure(String playerName) {
 		return assures.get(playerName);
 	}
 	
@@ -188,7 +189,7 @@ public class MerluchAssur extends JavaPlugin
 	 * Retourne une Collection de l'ensemble des Assures
 	 * @return Collection de l'ensemble des Assure
 	 * */
-	public Collection<Assure> getAssures(){
+	public Collection<Assure> getAssures() {
 		return assures.values();
 	}
 	

@@ -16,26 +16,28 @@ public class CommandMerluch implements CommandExecutor
 	 * @author labbeh
 	 * */
 	
+	/**
+	 * Instance de la classe principale du plugin pour avoir des actions dessus
+	 * */
 	private MerluchAssur ctrl;
 	
-	public CommandMerluch(MerluchAssur ctrl)
-	{
+	/**
+	 * Construit le gestionnaire de commande
+	 * @param ctrl instance de JavaPlugin pour agir dessus
+	 * */
+	public CommandMerluch(MerluchAssur ctrl){
 		this.ctrl = ctrl;
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args)
-	{
-		if(sender instanceof Player && args.length != 0 && cmdLabel.equalsIgnoreCase("merluch")) 
-		{
+	public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args){
+		if(sender instanceof Player && args.length != 0 && cmdLabel.equalsIgnoreCase("merluch")) {
 			Player player = (Player)sender;
 			
-			if(args[0].equalsIgnoreCase("setchest"))
-			{
+			if(args[0].equalsIgnoreCase("setchest")) {
 				Assure assure = this.ctrl.getAssure(player.getName());
 				
-				if(assure == null)
-				{
+				if(assure == null) {
 					player.sendMessage(ChatColor.RED + MerluchAssur.PLUGIN_NAME + 
 									   "ERREUR: vous n'êtes pas autorisé à souscrire à une assurance");
 					return false;
@@ -47,8 +49,7 @@ public class CommandMerluch implements CommandExecutor
 				assure.setWaitingForChest();
 			}
 			
-			else if(args[0].equalsIgnoreCase("status"))
-			{
+			else if(args[0].equalsIgnoreCase("status")) {
 				Chest playerChest = this.ctrl.getAssure(player.getName()).getChest();
 				
 				if(playerChest == null) player.sendMessage(ChatColor.BLUE +MerluchAssur.PLUGIN_NAME+ "Vous n'avez pas de coffre d'assurance" );
