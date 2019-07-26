@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import fr.labbeh.merluchassur.Assure;
 import fr.labbeh.merluchassur.MerluchAssur;
+import static fr.labbeh.merluchassur.MerluchAssur.sendMsgToPlayer;
 
 public class CommandMerluch implements CommandExecutor
 {
@@ -50,10 +51,15 @@ public class CommandMerluch implements CommandExecutor
 			}
 			
 			else if(args[0].equalsIgnoreCase("status")) {
-				Chest playerChest = this.ctrl.getAssure(player.getName()).getChest();
+				//System.out.println(player.getName() + "ok");
+				Assure assure = this.ctrl.getAssure(player.getName());
 				
-				if(playerChest == null) player.sendMessage(ChatColor.BLUE +MerluchAssur.PLUGIN_NAME+ "Vous n'avez pas de coffre d'assurance" );
-				else 					player.sendMessage(ChatColor.BLUE +MerluchAssur.PLUGIN_NAME+ "Votre coffre d'assurance:" +playerChest);
+				if(assure != null) {
+					Chest playerChest = assure.getChest();
+					if(playerChest == null) sendMsgToPlayer(player, ChatColor.BLUE, "Vous n'avez pas de coffre d'assurance" );
+					else 					sendMsgToPlayer(player, ChatColor.BLUE, "Votre coffre d'assurance:" +playerChest);
+				}
+				else player.sendMessage(ChatColor.BLUE +MerluchAssur.PLUGIN_NAME+ "Votre coffre n'êtes pas éligible à une assurance");
 			}
 			
 			/*else if(args[0].equalsIgnoreCase("save"))
@@ -67,6 +73,7 @@ public class CommandMerluch implements CommandExecutor
 			
 			return true;
 		}
+		else System.out.println("Erreur pas de joueur");
 		return false;
 	}
 }

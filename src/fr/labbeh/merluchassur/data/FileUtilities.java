@@ -1,4 +1,4 @@
-package fr.labbeh.merluchassur.files;
+package fr.labbeh.merluchassur.data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,12 +15,13 @@ import fr.labbeh.merluchassur.MerluchAssur;
 
 /**
  * @author labbeh
- * @description gestion des lectures/Ã©critures dans les fichiers de sauvegarde et de configuration du plugin
+ * @description gestion des lectures/écritures dans les fichiers de sauvegarde et de configuration du plugin
  * */
 
 public class FileUtilities
 {
 	private MerluchAssur ctrl;
+	//private TextFileData ctrl;
 	
 	public FileUtilities( MerluchAssur ctrl )
 	{
@@ -35,20 +36,25 @@ public class FileUtilities
 		int nbMorts = assure.getNbMorts();
 		Chest chest = assure.getChest();
 		
-		if(chest == null) return;
+		Double posX = null;
+		Double posY = null;
+		Double posZ = null;
+		String worldName = null;
 		
-		// position du coffre
-		double posX = chest.getLocation().getX();
-		double posY = chest.getLocation().getY();
-		double posZ = chest.getLocation().getZ();
+		if(chest != null) {
 		
-		// nom du monde ou se situe le coffre
-		String worldName = chest.getLocation().getWorld().getName();
+			// position du coffre
+			posX = chest.getLocation().getX();
+			posY = chest.getLocation().getY();
+			posZ = chest.getLocation().getZ();
 		
-		String toFile = FileUtilities.toString(worldName, playerName, nbMorts, posX, posY, posZ);
+			// nom du monde ou se situe le coffre
+			worldName = chest.getLocation().getWorld().getName();
+		}
 		
-		try
-		{
+		String toFile = toString(worldName, playerName, nbMorts, posX, posY, posZ);
+		
+		try {
 			FileWriter  fw = new FileWriter(MerluchAssur.DATAS_PATH +"/assureInfo"+ playerName +".dat");
 			PrintWriter pw = new PrintWriter(fw);
 			
@@ -57,18 +63,14 @@ public class FileUtilities
 			pw.close();
 			fw.close();
 		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		catch (IOException e) {e.printStackTrace();}
 	}
 	
 	public void readAssureStat()
 	{
 		// CONSTANTES
-		final String FILES_NAME_BEGIN = "assureInfo"											   ;
-		final int 	 END_INDEX		  = FILES_NAME_BEGIN.length()			   ;
+		final String FILES_NAME_BEGIN = "assureInfo";
+		final int 	 END_INDEX		  = FILES_NAME_BEGIN.length();
 		final File 	 DATAS_DIR 		  = new File(MerluchAssur.DATAS_PATH);
 		
 		// VARIABLES
@@ -81,12 +83,10 @@ public class FileUtilities
 			
 			// trie des fichiers dans le dossier des datas du plugin au cas ou on aurait ï¿½ y mettre d'autres types
 			// de fichiers ou si l'administrateur du serveur met des fichiers dedans
-			if(fileName.length() >= END_INDEX && fileName.substring(0, END_INDEX).equals(FILES_NAME_BEGIN))
-			{
-				try
-				{
+			if(fileName.length() >= END_INDEX && fileName.substring(0, END_INDEX).equals(FILES_NAME_BEGIN)) {
+				try {
 					Scanner  sc   = new Scanner(dataFiles[cpt]);
-					String   	line = sc.nextLine();
+					String   line = sc.nextLine();
 					sc.close();
 					
 					ArrayList<String> infos	= new ArrayList<>();
@@ -102,25 +102,29 @@ public class FileUtilities
 					String worldName  = infos.get(0);
 					String playerName = infos.get(1);
 					
-					int nbMorts = Integer.parseInt(infos.get(2));
+					if(!worldName.equals("null")) {
+						int nbMorts = Integer.parseInt(infos.get(2));
 					
-					double posX = Double.parseDouble(infos.get(3));
-					double posY = Double.parseDouble(infos.get(4));
-					double posZ = Double.parseDouble(infos.get(5));
+						double posX = Double.parseDouble(infos.get(3));
+						double posY = Double.parseDouble(infos.get(4));
+						double posZ = Double.parseDouble(infos.get(5));
 					
-					this.ctrl.setAssure(worldName, playerName, nbMorts, posX, posY, posZ);
+						ctrl.setAssure(worldName, playerName, nbMorts, posX, posY, posZ);
+					}
+					else ctrl.setAssure(playerName);
 				}
 				catch (FileNotFoundException e) {e.printStackTrace();}
 			}
 		}
 	}
 	
-	private static String toString(String worldName, String playerName, int nbMorts, double posX, double posY, double posZ)
+	private static String toString(String worldName, String playerName, int nbMorts, Double posX, Double posY, Double posZ)
 	{
 		final String DELIM = ";";
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(worldName);
+		if(worldName != null) sb.append(worldName);
+		else sb.append("null");
 		sb.append(DELIM);
 		
 		sb.append(playerName);
@@ -129,11 +133,13 @@ public class FileUtilities
 		sb.append(nbMorts);
 		sb.append(DELIM);
 		
-		sb.append(posX);
+		if(posX != null) sb.append(posX);
 		sb.append(DELIM);
-		sb.append(posY);
+		
+		if(posY != null) sb.append(posY);
 		sb.append(DELIM);
-		sb.append(posZ);
+		
+		if(posZ != null) sb.append(posZ);
 		
 		return sb.toString();
 	}

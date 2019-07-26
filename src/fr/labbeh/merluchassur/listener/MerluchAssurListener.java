@@ -1,5 +1,6 @@
 package fr.labbeh.merluchassur.listener;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -14,10 +15,10 @@ import org.bukkit.inventory.PlayerInventory;
 
 import fr.labbeh.merluchassur.Assure;
 import fr.labbeh.merluchassur.MerluchAssur;
+import static fr.labbeh.merluchassur.MerluchAssur.sendMsgToPlayer;
 
 import org.bukkit.block.Chest;
 
-import net.md_5.bungee.api.ChatColor;
 
 /**
  * @author labbeh
@@ -41,6 +42,8 @@ public class MerluchAssurListener implements Listener
 		
 		if(playerChest == null) return;// si le joueur n'a pas de coffre on s'arrÃªte lÃ 
 		
+		// si le joueur est déjà mort plus du nombre de fois autorisé
+		// son stuff n'est pas déplacé dans le coffre
 		if(this.ctrl.getAssure(player.getName()).getNbMorts() < Assure.NB_MORT_MAX)
 		{
 			PlayerInventory inventory 	  = player.getInventory	 ();
@@ -74,7 +77,7 @@ public class MerluchAssurListener implements Listener
 		{
 			Location chestLoc = clickedBlock.getLocation();
 			
-			player.sendMessage(ChatColor.RED +"[MerluchAssur] Vous avez sÃ©lectionnÃ© le coffre en " +chestLoc.toString());
+			sendMsgToPlayer(player, ChatColor.RED, "Vous avez sélectionner le coffre en " +chestLoc.toString());
 			assure.setChest((Chest)clickedBlock.getState());
 			
 			this.ctrl.save(player.getName()); // sauvegarde des modifications dans le fichier de configuration
@@ -94,6 +97,7 @@ public class MerluchAssurListener implements Listener
 		if(evt.getBlock().getType() == Material.CHEST)
 		{
 			Chest breakedChest = (Chest)evt.getBlock().getState();
+			//System.out.println("chest cassé");
 			
 			for(Assure assure: ctrl.getAssures())
 			{
@@ -101,13 +105,10 @@ public class MerluchAssurListener implements Listener
 				
 				if(assureChest != null && breakedChest.equals(assureChest))
 				{
-					player.sendMessage(ChatColor.RED 					 +
-									   MerluchAssur.PLUGIN_NAME 		 + 
-									   "vous avez dÃ©truit le coffre de " +
-									   assure.getPlayerName()
-									  );
+					sendMsgToPlayer(player, ChatColor.RED, "vous avez dÃ©truit le coffre de " + assure.getPlayerName());
 					
 					assure.setChest(null);
+					System.out.println("chest: " +assure.getChest());
 					this.ctrl.save(assure.getPlayerName()); // sauvegarde des modifications
 					
 					return; // on arrÃªte la boucle

@@ -4,6 +4,7 @@ import org.bukkit.block.Chest;
 
 /**
  * @author labbeh
+ * Regroupe toutes les informations sur l'assurance d'un joueur
  * */
 
 public class Assure

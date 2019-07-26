@@ -1,15 +1,20 @@
 package fr.labbeh.merluchassur;
 
 import fr.labbeh.merluchassur.commands.*;
+import fr.labbeh.merluchassur.data.IData;
+import fr.labbeh.merluchassur.data.TextFileData;
 import fr.labbeh.merluchassur.files.*;
 import fr.labbeh.merluchassur.listener.MerluchAssurListener;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MerluchAssur extends JavaPlugin
@@ -33,12 +38,17 @@ public class MerluchAssur extends JavaPlugin
 	 * HashMap d'assuré qui associe au nom du joueur son objet Assure qui lui est
 	 * associé et charger à partir du fichier de sauvegarde
 	 * */
-	private HashMap<String, Assure> assures;
+	//private HashMap<String, Assure> assures;
 	
 	/**
 	 * Instance de FileUtilities pour la gestion de l'�criture et lecture dans les fichiers de configuration
 	 * */
-	private FileUtilities fu;
+	//private FileUtilities fu;
+	
+	/**
+	 * Gestion des données
+	 * */
+	private IData datas;
 	
 	
 	/**
@@ -46,8 +56,9 @@ public class MerluchAssur extends JavaPlugin
 	 * */
 	public MerluchAssur() {
 		super();
-		this.assures = new HashMap<>();
-		this.fu = new FileUtilities(this);
+		//this.assures = new HashMap<>();
+		//this.fu = new FileUtilities(this);
+		datas = new TextFileData(this);
 		
 		//this.enDure();
 		//this.setAssure(null,0,0.0,0.0,0.0);
@@ -57,18 +68,19 @@ public class MerluchAssur extends JavaPlugin
 	 * Mode test pour rentrer des assurés en dure
 	 * Ajoute 2 assurés du nom de labbeh et tsaero
 	 * */
-	public void enDure() {
+	/*public void enDure() {
 		this.assures.put("labbeh", new Assure("labbeh"));
 		this.assures.put("tsaero", new Assure("tsaero"));
-	}
+	}*/
 	
 	/**
 	 * Ajoute un nouvel assur� et cr��er son fichier de configuration
 	 * @param playerName nom du joueur � assurer en String
 	 * */
 	public void add(String playerName) {
-		this.assures.put(playerName, new Assure(playerName));
-		this.saveAll();
+		/*this.assures.put(playerName, new Assure(playerName));
+		this.saveAll();*/
+		datas.addAssure(new Assure(playerName));
 	}
 	
 	/**
@@ -86,12 +98,14 @@ public class MerluchAssur extends JavaPlugin
 		this.getServer().getPluginManager().registerEvents(new MerluchAssurListener(this), this);
 		
 		// pour le dossier qui contiendra les fichiers de configuration / serializations des assurances des joueurs
-		if(this.prepareSerialization())
+		/*if(this.prepareSerialization())
 			System.out.println(MerluchAssur.PLUGIN_NAME +"Aucun dossier de fichiers de configuration, il vient d'être crééer");
 		else
 			System.out.println(MerluchAssur.PLUGIN_NAME +"dossier de fichiers de configuration détecté");
 		
-		this.fu.readAssureStat();
+		this.fu.readAssureStat();*/
+		datas.init();
+		
 		System.out.println("MerluchAssur beta1.0 by labbeh: enabled");
 	}
 	
@@ -108,27 +122,29 @@ public class MerluchAssur extends JavaPlugin
 	 * Crééer le dossier de sauvegarde des fichiers de données des assurés si il n'exsite pas
 	 * @return vrai si le dossier n'exsite pas et qu'il vient d'être crééer
 	 * */
-	public boolean prepareSerialization() {
+	/*public boolean prepareSerialization() {
 		File dataDirectory = new File(MerluchAssur.DATAS_PATH);
 		return dataDirectory.mkdir();
-	}
+	}*/
 	
 	/**
 	 * Sauvgarde les infos de l'assuré dont le nom est passé en paramètre
 	 * @param playerName nom de l'assuré en String
 	 * */
 	public void save(String playerName) {
-		this.fu.saveAssureStat(playerName);
+		//this.fu.saveAssureStat(playerName);
+		datas.save(playerName);
 	}
 	
 	/**
 	 * Sauvegarde les infos de tous les assurés
 	 * */
 	public void saveAll() {
-		Collection<Assure> assures = this.assures.values();
+		/*Collection<Assure> assures = this.assures.values();
 		
 		for(Assure assure: assures)
-			this.save(assure.getPlayerName());
+			this.save(assure.getPlayerName());*/
+		datas.saveAll();
 	}
 	
 	/**
@@ -142,14 +158,13 @@ public class MerluchAssur extends JavaPlugin
 		assure.getChest().getInventory().clear();
 		
 		return true;
-		
 	}
 	
 	/*---------------*/
 	/* MODIFICATEURS */
 	/*---------------*/
 	/**
-	 * Ajoute un Assure existant dans un fichier
+	 * Ajoute un Assure existant dans un fichier lors du démarrage du serveur
 	 * @param worldName nom du monde
 	 * @param playerName nom du joueur
 	 * @param nbMorts nombre de fois ou est mort le joueur
@@ -162,7 +177,17 @@ public class MerluchAssur extends JavaPlugin
 		Location locChest  	  = new Location(worldOfChest, posX, posY, posZ);
 		Chest 	 chest 		  = (Chest)locChest.getBlock().getState();
 		
-		assures.put(playerName, new Assure(playerName, nbMorts, chest));
+		//assures.put(playerName, new Assure(playerName, nbMorts, chest));
+		datas.addAssure(new Assure(playerName, nbMorts, chest));
+	}
+	
+	/**
+	 * Ajoute un Assure existant dans un fichier lors du démarrage du serveur
+	 * lorsqu'il est éligible à une assurance mais qu'il n'a pas de coffre
+	 * @param playerName nom du joueur
+	 * */
+	public void setAssure(String playerName) {
+		datas.addAssure(new Assure(playerName));
 	}
 	
 	/**
@@ -182,7 +207,8 @@ public class MerluchAssur extends JavaPlugin
 	 * @return Assure associé au nom en paramètre ou null
 	 * */
 	public Assure getAssure(String playerName) {
-		return assures.get(playerName);
+		//return assures.get(playerName);
+		return datas.getAssure(playerName);
 	}
 	
 	/**
@@ -190,14 +216,36 @@ public class MerluchAssur extends JavaPlugin
 	 * @return Collection de l'ensemble des Assure
 	 * */
 	public Collection<Assure> getAssures() {
-		return assures.values();
+		//return assures.values();
+		return datas.getAssures();
 	}
 	
 	/**
 	 * Retourne le nombre d'assurés
 	 * */
-	public int getNbAssure() {
-		return assures.size();
+	/*public int getNbAssure() {
+		//return assures.size();
+	}*/
+	
+	/**
+	 * Permet d'envoyer un message dans la console du joueur
+	 * en ajoutant le nom du plugin et une couleur précise
+	 * @param player instance du joueur destinataire du message
+	 * @param color couleur dans laquelle apparaitra le message,
+	 * des constantes sont définis dans la classe ChatColor
+	 * @param msg contenu du message
+	 * */
+	public static void sendMsgToPlayer(Player player, ChatColor color, String msg) {
+		player.sendMessage(color +PLUGIN_NAME+ msg);
+	}
+	
+	/**
+	 * Envoi un message au joueur dans sa couleur par défaut
+	 * @param player instance du joueur destinataire du message
+	 * @param msg contenu du message
+	 * */
+	public static void sendMsgToPlayer(Player player, String msg) {
+		player.sendMessage(msg);
 	}
 
 }
