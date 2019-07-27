@@ -4,6 +4,7 @@
 package fr.labbeh.merluchassur.data;
 
 import java.util.Collection;
+import java.util.Set;
 
 import fr.labbeh.merluchassur.Assure;
 
@@ -40,6 +41,12 @@ public interface IData {
 	 * @return Collection de l'ensemble des assurés
 	 * */
 	public Collection<Assure> getAssures();
+	
+	/**
+	 * Retourne l'ensemble des noms des joueurs assurés
+	 * @return Set<String> contenant le nom des joueurs assurés
+	 * */
+	public Set<String> getNames();
 	
 	/**
 	 * Sauvegarde les modifications sur disque pour un assuré précis

@@ -55,7 +55,7 @@ public class FileUtilities
 		String toFile = toString(worldName, playerName, nbMorts, posX, posY, posZ);
 		
 		try {
-			FileWriter  fw = new FileWriter(MerluchAssur.DATAS_PATH +"/assureInfo"+ playerName +".dat");
+			FileWriter  fw = new FileWriter(TextFileData.DATAS_PATH +"/assureInfo"+ playerName +".dat");
 			PrintWriter pw = new PrintWriter(fw);
 			
 			pw.println(toFile);
@@ -71,7 +71,7 @@ public class FileUtilities
 		// CONSTANTES
 		final String FILES_NAME_BEGIN = "assureInfo";
 		final int 	 END_INDEX		  = FILES_NAME_BEGIN.length();
-		final File 	 DATAS_DIR 		  = new File(MerluchAssur.DATAS_PATH);
+		final File 	 DATAS_DIR 		  = new File(TextFileData.DATAS_PATH);
 		
 		// VARIABLES
 		File[] dataFiles = DATAS_DIR.listFiles();

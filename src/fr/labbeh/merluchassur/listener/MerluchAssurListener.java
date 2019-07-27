@@ -97,7 +97,6 @@ public class MerluchAssurListener implements Listener
 		if(evt.getBlock().getType() == Material.CHEST)
 		{
 			Chest breakedChest = (Chest)evt.getBlock().getState();
-			//System.out.println("chest cassé");
 			
 			for(Assure assure: ctrl.getAssures())
 			{

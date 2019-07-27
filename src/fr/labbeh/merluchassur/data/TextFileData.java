@@ -4,11 +4,17 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import fr.labbeh.merluchassur.Assure;
 import fr.labbeh.merluchassur.MerluchAssur;
 
 public class TextFileData implements IData {
+	/**
+	 * Chemin du dossier qui contient les fichiers de configuration
+	 * */
+	public static final String DATAS_PATH = "./plugins/merluchDatas"; 
+	
 	/**
 	 * HashMap d'assuré qui associe au nom du joueur son objet Assure qui lui est
 	 * associé et charger à partir du fichier de sauvegarde
@@ -56,6 +62,11 @@ public class TextFileData implements IData {
 	}
 	
 	@Override
+	public Set<String> getNames(){
+		return assures.keySet();
+	}
+	
+	@Override
 	public void save(String playerName) {
 		fu.saveAssureStat(playerName);
 	}
@@ -76,7 +87,7 @@ public class TextFileData implements IData {
 	 * @return vrai si le dossier n'exsite pas et qu'il vient d'être crééer
 	 * */
 	public boolean prepareSerialization() {
-		File dataDirectory = new File(MerluchAssur.DATAS_PATH);
+		File dataDirectory = new File(DATAS_PATH);
 		return dataDirectory.mkdir();
 	}
 }

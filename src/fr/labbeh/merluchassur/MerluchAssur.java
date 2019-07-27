@@ -1,49 +1,34 @@
 package fr.labbeh.merluchassur;
+/**
+ * Classe principale du plugin MerluchAssur.
+ * Ce plugin permet de crééer un système d'assurance pour les biens d'un joueur
+ * lors de sa mort
+ * @author labbeh
+ * @version 2019-07-27, 1.0
+ * */
 
 import fr.labbeh.merluchassur.commands.*;
 import fr.labbeh.merluchassur.data.IData;
 import fr.labbeh.merluchassur.data.TextFileData;
-import fr.labbeh.merluchassur.files.*;
 import fr.labbeh.merluchassur.listener.MerluchAssurListener;
 
-import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Chest;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MerluchAssur extends JavaPlugin
-{
-	/**
-	 * @author labbeh
-	 * */
-	
+public class MerluchAssur extends JavaPlugin {	
 	/**
 	 * constante pour afficher le nom du plugins lorsqu'il envoie un message dans la console
 	 * ou dans le chat
 	 * */
 	public static final String PLUGIN_NAME = "[MerluchAssur] ";
-	
-	/**
-	 * Chemin du dossier qui contient les fichiers de configuration
-	 * */
-	public static final String DATAS_PATH  	 = "./plugins/merluchDatas"; 
-	
-	/**
-	 * HashMap d'assuré qui associe au nom du joueur son objet Assure qui lui est
-	 * associé et charger à partir du fichier de sauvegarde
-	 * */
-	//private HashMap<String, Assure> assures;
-	
-	/**
-	 * Instance de FileUtilities pour la gestion de l'�criture et lecture dans les fichiers de configuration
-	 * */
-	//private FileUtilities fu;
 	
 	/**
 	 * Gestion des données
@@ -56,12 +41,7 @@ public class MerluchAssur extends JavaPlugin
 	 * */
 	public MerluchAssur() {
 		super();
-		//this.assures = new HashMap<>();
-		//this.fu = new FileUtilities(this);
 		datas = new TextFileData(this);
-		
-		//this.enDure();
-		//this.setAssure(null,0,0.0,0.0,0.0);
 	}
 	
 	/**
@@ -78,9 +58,12 @@ public class MerluchAssur extends JavaPlugin
 	 * @param playerName nom du joueur � assurer en String
 	 * */
 	public void add(String playerName) {
-		/*this.assures.put(playerName, new Assure(playerName));
-		this.saveAll();*/
 		datas.addAssure(new Assure(playerName));
+		
+		Player player = getServer().getPlayer(playerName);
+		if(player != null)
+			sendMsgToPlayer(player, ChatColor.GREEN, "L'administrateur du serveur vous à inscrit à l'assurance !"
+												   + "Allez choisir un coffre au plus vite !");
 	}
 	
 	/**
@@ -92,20 +75,18 @@ public class MerluchAssur extends JavaPlugin
 	public void onEnable() {
 		super.onEnable();
 		
+		// enregistrement des 2 commandes du plugin
 		this.getCommand("merluch"	  ).setExecutor(new CommandMerluch(this)	 );
 		this.getCommand("merluchadmin").setExecutor(new CommandMerluchAdmin(this));
 		
+		// mise en place du listener sur les évènements du joueur
+		// sert à la gestion du coffre
 		this.getServer().getPluginManager().registerEvents(new MerluchAssurListener(this), this);
 		
-		// pour le dossier qui contiendra les fichiers de configuration / serializations des assurances des joueurs
-		/*if(this.prepareSerialization())
-			System.out.println(MerluchAssur.PLUGIN_NAME +"Aucun dossier de fichiers de configuration, il vient d'être crééer");
-		else
-			System.out.println(MerluchAssur.PLUGIN_NAME +"dossier de fichiers de configuration détecté");
-		
-		this.fu.readAssureStat();*/
+		// initialisation du système de gestion des données sur disque
 		datas.init();
 		
+		// message(s) d'information au démarrage
 		System.out.println("MerluchAssur beta1.0 by labbeh: enabled");
 	}
 	
@@ -221,6 +202,14 @@ public class MerluchAssur extends JavaPlugin
 	}
 	
 	/**
+	 * Retourne l'ensemble des noms des joueurs assurés
+	 * @return un Set<String> contenant le nom des joueurs assurés
+	 * */
+	public Set<String> getNames(){
+		return datas.getNames();
+	}
+	
+	/**
 	 * Retourne le nombre d'assurés
 	 * */
 	/*public int getNbAssure() {
@@ -245,7 +234,24 @@ public class MerluchAssur extends JavaPlugin
 	 * @param msg contenu du message
 	 * */
 	public static void sendMsgToPlayer(Player player, String msg) {
-		player.sendMessage(msg);
+		player.sendMessage(PLUGIN_NAME+ msg);
+	}
+	
+	/**
+	 * Envoi un message dans la console
+	 * @param msg message à envoyer dans la console
+	 * */
+	public static void sendMsgToConsole(String msg) {
+		System.out.println(msg);
+	}
+	
+	/**
+	 * Permet d'envoyer un message à celui qui envoie une commande
+	 * @param sender envoyeur de la commande
+	 * @param msg message à lui envoyer
+	 * */
+	public static void sendMsgToCmdSender(CommandSender sender, String msg) {
+		sender.sendMessage(PLUGIN_NAME + msg);
 	}
 
 }

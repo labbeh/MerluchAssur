@@ -11,12 +11,7 @@ import fr.labbeh.merluchassur.Assure;
 import fr.labbeh.merluchassur.MerluchAssur;
 import static fr.labbeh.merluchassur.MerluchAssur.sendMsgToPlayer;
 
-public class CommandMerluch implements CommandExecutor
-{
-	/**
-	 * @author labbeh
-	 * */
-	
+public class CommandMerluch implements CommandExecutor {
 	/**
 	 * Instance de la classe principale du plugin pour avoir des actions dessus
 	 * */
@@ -40,18 +35,17 @@ public class CommandMerluch implements CommandExecutor
 				
 				if(assure == null) {
 					player.sendMessage(ChatColor.RED + MerluchAssur.PLUGIN_NAME + 
-									   "ERREUR: vous n'Ãªtes pas autorisÃ© Ã  souscrire Ã  une assurance");
+									   "ERREUR: vous n'êtes pas autorisé à  souscrire à  une assurance");
 					return false;
 				}
 				
 				player.sendMessage(ChatColor.GREEN + MerluchAssur.PLUGIN_NAME +
-								   "SÃ©lectionnez un coffre pour votre assurance");
+								   "Sélectionnez un coffre pour votre assurance");
 				
 				assure.setWaitingForChest();
 			}
 			
 			else if(args[0].equalsIgnoreCase("status")) {
-				//System.out.println(player.getName() + "ok");
 				Assure assure = this.ctrl.getAssure(player.getName());
 				
 				if(assure != null) {
@@ -61,15 +55,6 @@ public class CommandMerluch implements CommandExecutor
 				}
 				else player.sendMessage(ChatColor.BLUE +MerluchAssur.PLUGIN_NAME+ "Votre coffre n'êtes pas éligible à une assurance");
 			}
-			
-			/*else if(args[0].equalsIgnoreCase("save"))
-			{
-				String playerName = player.getName();
-				this.ctrl.save(playerName);
-				
-				player.sendMessage(ChatColor.GREEN +MerluchAssur.PLUGIN_NAME+ "Sauvegarde dans le fichier");
-			}*/
-			
 			
 			return true;
 		}

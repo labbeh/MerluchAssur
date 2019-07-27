@@ -1,7 +1,5 @@
 package fr.labbeh.merluchassur.commands;
 
-import org.bukkit.ChatColor;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,8 +8,13 @@ import org.bukkit.entity.Player;
 
 import fr.labbeh.merluchassur.Assure;
 import fr.labbeh.merluchassur.MerluchAssur;
+import net.md_5.bungee.api.ChatColor;
+
+import static fr.labbeh.merluchassur.MerluchAssur.sendMsgToCmdSender;
 
 /**
+ * Cette commande d'administration permet aux ops du serveur de réaliser
+ * des configurations du plugin
  * @author labbeh
  * */
 
@@ -19,88 +22,75 @@ public class CommandMerluchAdmin implements CommandExecutor
 {
 	private MerluchAssur ctrl;
 	
-	public CommandMerluchAdmin(MerluchAssur ctrl)
-	{
-		this.ctrl = ctrl;
-	}
-
+	/**
+	 * Constructeur par défaut
+	 * */
+	public CommandMerluchAdmin(MerluchAssur ctrl){this.ctrl = ctrl;}
+	
+	/**
+	 * Ce qui se passe lorsque la commande est entrée
+	 * */
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args) 
-	{
-		if(sender instanceof ConsoleCommandSender)
-		{
-			ConsoleCommandSender ccs = (ConsoleCommandSender)sender;
-			if(args.length == 0)
-			{
-				ccs.sendMessage(MerluchAssur.PLUGIN_NAME+ "Erreur: pas d'argument");
+	public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args) {
+		if(sender instanceof ConsoleCommandSender || (sender instanceof Player && sender.isOp())){
+			// on test le cas ou il n'y a pas d'arguments
+			if(args.length == 0){
+				sendMsgToCmdSender(sender, "Erreur: pas d'argument");
 				return false;
 			}
-			else if(args[0].equalsIgnoreCase("add"))
-			{
-				if(args.length < 2)
-				{
-					ccs.sendMessage(MerluchAssur.PLUGIN_NAME+ "Erreur: saisir le nom d'un joueur");
+			
+			if(args[0].equalsIgnoreCase("add")){
+				if(args.length < 2){
+					sendMsgToCmdSender(sender, "Erreur: saisir le nom d'un joueur");
 					return false;
 				}
 				
 				this.ctrl.add(args[1]);
-				ccs.sendMessage(MerluchAssur.PLUGIN_NAME+ "Joueur " +args[1]+ " assure !");
+				sendMsgToCmdSender(sender, "Joueur " +args[1]+ " assure !");
+				return true;
+			}
+			else if(args[0].equalsIgnoreCase("clear")) {
+				if(args.length < 2){
+					sendMsgToCmdSender(sender, "ERREUR: vous devez saisir le nom des joueurs");
+					return false;
+				}
+				else{
+					for(int cpt=1; cpt<args.length; cpt++){
+						Assure temp = this.ctrl.getAssure(args[cpt]);
+						
+						if(temp == null)
+							sendMsgToCmdSender(sender, " ERREUR: joueur " +args[cpt]+ "introuvable");
+						else{
+							temp.getChest().getInventory().clear();
+							sendMsgToCmdSender(sender, "Coffre de " +args[cpt]+ " vidé !");
+						}
+					}
+				}
+				return true;
+			}
+			
+			else if(args[0].equalsIgnoreCase("save")){
+				this.ctrl.saveAll();
+				sendMsgToCmdSender(sender, "Sauvegarde dans le fichier");
+				return true;
+			}
+			/* A REVOIR a partir d'ici */
+			else if(args[0].equalsIgnoreCase("list")) {
+				String s = "";
+				for(String name: ctrl.getNames()) {
+					Player player = ctrl.getServer().getPlayer(name);
+					
+					s += "  -> " + name +": ";
+					if(player == null) s += ChatColor.RED + "non connecté" + ChatColor.WHITE;
+					else 			   s += ChatColor.GREEN + "connecté"   + ChatColor.WHITE;
+					s += "\n";
+					
+				}
+				sendMsgToCmdSender(sender, "Joueurs actuellement assurés:\n" + s);
 				return true;
 			}
 		}
-		
-		if(sender instanceof Player && args.length != 0 && cmdLabel.equalsIgnoreCase("merluchadmin")) 
-		{
-			Player player = (Player)sender;
-			
-			if(player.getName().equalsIgnoreCase("labbeh") || player.getName().equalsIgnoreCase("tsaero")) 
-			{
-				if(args[0].equals("clear")) 
-				{
-					if(args.length < 2)
-					{
-						player.sendMessage(ChatColor.RED 			+ 
-										   MerluchAssur.PLUGIN_NAME +
-										   "ERREUR: vous devez saisir le nom des joueurs"
-										  );
-						return false;
-					}
-					else
-					{
-						for(int cpt=1; cpt<args.length; cpt++)
-						{
-							Assure temp = this.ctrl.getAssure(args[cpt]);
-							
-							if(temp == null)
-								player.sendMessage(ChatColor.RED 			+ 
-												   MerluchAssur.PLUGIN_NAME +
-												   " ERREUR: joueur " +args[cpt]+ "introuvable"
-												  );
-							else
-							{
-								temp.getChest().getInventory().clear();
-								player.sendMessage(MerluchAssur.PLUGIN_NAME + " Coffre de " +args[cpt]+ " vidÃ© !");
-							}
-						}
-					}
-					return true;
-				}
-				
-				else if(args[0].equalsIgnoreCase("save"))
-				{
-					this.ctrl.saveAll();
-					
-					player.sendMessage(ChatColor.GREEN +MerluchAssur.PLUGIN_NAME+ "Sauvegarde dans le fichier");
-					return true;
-				}
-			}
-			player.sendMessage(ChatColor.RED 		   +
-							   MerluchAssur.PLUGIN_NAME+
-							   "Vous n'avez pas l'autorisation d'utiliser cette commande"
-							  );
-		}
-		
+		sendMsgToCmdSender(sender, "Vous n'avez pas l'autorisation d'utiliser cette commande");
 		return false;
-	}
-
-}
+	}// fin de onCommand
+}// fi,n de classe
